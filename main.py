@@ -20,25 +20,49 @@ opening_hours = str()
 work_days = str()
 
 
-def get_value(first_separator, second_separator):
+def get_value(first_separator, item, second_separator):
     return re.split(first_separator, str(item))[1].split(second_separator)[0]
 
 
+counter = 0
 for item in items:
-    city = get_value('name">', '</h4>')
-    address = get_value('address="', '"')
-    latitude = get_value('latitude="', '"')
-    longitude = get_value('longitude="', '"')
-    store_name = get_value('shop-name">', '</')
-    opening_hours = get_value('mode2="', '"')
-    work_days = get_value('mode1="', '"')
-    phone = get_value('phone">', '</')
-    output_list.append({
-        'address': f'{city}, {address}',
-        'latlon': [latitude, longitude],
-        'name': store_name,
-        'phones': [phone],
-        'working_hours': [work_days, opening_hours]})
+    counter = str(item).count('data-shop-address')
+    if counter > 1:
+        shops_same_city = re.split('shop-list-item', str(item))
+        city = get_value('name">', item, '</h4>')
+        for nested_item in shops_same_city:
+            try:
+                address = get_value('address="', nested_item, '"')
+                latitude = get_value('latitude="', nested_item, '"')
+                longitude = get_value('longitude="', nested_item, '"')
+                store_name = get_value('shop-name">', nested_item, '</')
+                opening_hours = get_value('mode2="', nested_item, '"')
+                work_days = get_value('mode1="', nested_item, '"')
+                phone = get_value('phone">', nested_item, '</')
+                output_list.append({
+                    'address': f'{city}, {address}',
+                    'latlon': [latitude, longitude],
+                    'name': store_name,
+                    'phones': [phone],
+                    'working_hours': [work_days, opening_hours]})
+            except IndexError:
+                # list index out of range (think about how to fix)
+                pass
+    else:
+        city = get_value('name">', item, '</h4>')
+        address = get_value('address="', item, '"')
+        latitude = get_value('latitude="', item, '"')
+        longitude = get_value('longitude="', item, '"')
+        store_name = get_value('shop-name">', item, '</')
+        opening_hours = get_value('mode2="', item, '"')
+        work_days = get_value('mode1="', item, '"')
+        phone = get_value('phone">', item, '</')
+        output_list.append({
+            'address': f'{city}, {address}',
+            'latlon': [latitude, longitude],
+            'name': store_name,
+            'phones': [phone],
+            'working_hours': [work_days, opening_hours]})
 
 for line in output_list:
     print(line)
