@@ -1,5 +1,7 @@
 import re
 
+import json
+
 from bs4 import BeautifulSoup
 
 import requests
@@ -61,8 +63,8 @@ for item in items:
             'address': f'{city}, {address}',
             'latlon': [latitude, longitude],
             'name': store_name,
-            'phones': [phone],
+            'phones': phone,
             'working_hours': [work_days, opening_hours]})
 
-for line in output_list:
-    print(line)
+with open('data.json', 'w', encoding='utf-8') as file:
+    json.dump(output_list, file, indent=4, ensure_ascii=False)
